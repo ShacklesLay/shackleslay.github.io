@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Third | ShacklesLay&#39;s Blog</title>
+<meta name="keywords" content="">
+<meta name="description" content="Transformer 原论文。学习于Transformer论文逐段精读【论文精读】_哔哩哔哩_bilibili。 摘要 主流的序列转换模型（例如机器翻译）主要依赖于复杂的CNN或RNN，网络架构有encoder 和 decoder，并且有着注意力机制。 Transformer是一个简单的模型，只依赖注意力机制">
+<meta name="author" content="ShacklesLay">
+<link rel="canonical" href="https://shackleslay.github.io/posts/third/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.5c25c975546c048d1a5600aadb48425ae1bc921a9a18fe67d6955c9535260811.css" integrity="sha256-XCXJdVRsBI0aVgCq20hCWuG8khqaGP5n1pVclTUmCBE=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.acb54fd32bbc1982428b8850317e45d076b95012730a5936667e6bc21777692a.js" integrity="sha256-rLVP0yu8GYJCi4hQMX5F0Ha5UBJzClk2Zn5rwhd3aSo="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://shackleslay.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://shackleslay.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://shackleslay.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://shackleslay.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://shackleslay.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:title" content="Third" />
+<meta property="og:description" content="Transformer 原论文。学习于Transformer论文逐段精读【论文精读】_哔哩哔哩_bilibili。 摘要 主流的序列转换模型（例如机器翻译）主要依赖于复杂的CNN或RNN，网络架构有encoder 和 decoder，并且有着注意力机制。 Transformer是一个简单的模型，只依赖注意力机制" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://shackleslay.github.io/posts/third/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-12-04T23:09:06+08:00" />
+<meta property="article:modified_time" content="2023-12-04T23:09:06+08:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Third"/>
+<meta name="twitter:description" content="Transformer 原论文。学习于Transformer论文逐段精读【论文精读】_哔哩哔哩_bilibili。 摘要 主流的序列转换模型（例如机器翻译）主要依赖于复杂的CNN或RNN，网络架构有encoder 和 decoder，并且有着注意力机制。 Transformer是一个简单的模型，只依赖注意力机制"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://shackleslay.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Third",
+      "item": "https://shackleslay.github.io/posts/third/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Third",
+  "name": "Third",
+  "description": "Transformer 原论文。学习于Transformer论文逐段精读【论文精读】_哔哩哔哩_bilibili。 摘要 主流的序列转换模型（例如机器翻译）主要依赖于复杂的CNN或RNN，网络架构有encoder 和 decoder，并且有着注意力机制。 Transformer是一个简单的模型，只依赖注意力机制",
+  "keywords": [
+    
+  ],
+  "articleBody": "Transformer 原论文。学习于Transformer论文逐段精读【论文精读】_哔哩哔哩_bilibili。\n摘要 主流的序列转换模型（例如机器翻译）主要依赖于复杂的CNN或RNN，网络架构有encoder 和 decoder，并且有着注意力机制。 Transformer是一个简单的模型，只依赖注意力机制。 这个模型在机器翻译上的效果很好。\n结论 Transformer不同于其他模型的点是，它把被广泛运用在encoder-decoder结构上的循环层（recurrent layer）换成了多头自注意力机制。 他们觉得transformer能够在其他领域和任务上应用得很好。\n导言 在序列模型中，主流的模型是RNN中的 long short-term memory(LSTM) 和 gated recurrent (GRU)。在这其中，有两个主流的模型，语言模型和编码器-解码器的架构，后者通常被用于输出的结构化信息比较多的时候。 在RNN中，它是一个词接着一个词的输出，它们生成当前词的隐藏状态，是根据当前词的输入和前一个词的隐藏状态，这使得它能够时序化地生成。 问题在于，这样一个时序化的过程无法并行，计算性能就会比较差；另外，在生成后面的词的隐藏状态时，前面的词的隐藏状态可能会丢掉，如果不想丢掉，可能需要做一个比较大的隐藏状态，这加剧了内存开销。虽然有着很多的研究与改进，但没有解决这些问题。 Transformer纯基于注意力机制，因此可以并行，计算性能更高。\n相关工作 已经发表的很多工作意图用卷积神经网络代替循环神经网络，但是卷积神经网络很难对一个长序列建模，因为卷积每一次都只看一个很小的窗口，如果想要同时看到很远的两个位置，需要很深的卷积层才能实现。如果使用Transformer就能够很轻易的同时看到。 卷积神经网络的一个优势在于它可以有很多的输出通道，每一个输出通道都可以识别一个模式，Transformer的多头注意力机制可以模仿这个效果。 自注意机制在前人的工作中就已经提出。但transformer是第一个只基于注意力机制的编码器-解码器模型\n模型 编码器会将序列输入$(x_1,\\dots,x_n)$ （每一个$x_i$代表一个词）转换为序列$z=(z_1,\\dots, z_n)$ （每一个$z_i$是对$x_i$的向量表示） 解码器拿到$z$后，会输出序列$(y_1,\\dots,y_m)$，注意输出序列的长度与编码器的输出长度可能不一致，而且这个输出只能一个一个生成，这是一个auto-regressive（自回归）的过程，即过去时刻的输出，也会作为当前输出的输入。 Transformer也是编码器-解码器的架构，结构如下： 模型左边是编码器，右边是解码器。解码器的输入端其实是以前时刻的输出，所以名为Outputs, shifted right意为解码器输出和输入都是一个一个向右移的\n编码器和解码器 编码器 它用了N=6的六个块（原文中称为layer），每一层中有两个子层，多头自注意力机制和position-wise fully connected feed-forward network，后面这个网络其实就是MLP。每一子层再作残差链接，并作layer normalization，即 $LayerNorm(x+Sublayer(x))$。由于残差连接要求向量长度一样，因此它让每一个子层的输出维度都是 $d_{model}=512$ (这个简单设计使得Transformer相比于CNN等模型具有更少的超参数，它一般只调整上述的两个超参数)\nbatch normalization vs. Layer nomalization 考虑一个二维输入的情况，x是一个batch，shape(x)=m,n，每一行代表一个样本，每一列代表一个特征。batch norm把每一个特征在一个mini-batch里作标准化，即把每一列的均值变为0，方差变为1。而作预测时会将全局的均值和方差记录下来 同样一个二维输入，layer norm对每一行作标准化，不需要记录全局的均值和方差 transformer里的输入一般是三维的（batch, 序列，向量），此时列表示的是序列的长度。 在时序模型里，样本的长度可能不一致，如果样本的长度变化较大，由于batch norm时按照特征维度作标准化，batch norm算出来的均值和方差抖动会比较大；而layer norm由于是对每一个样本作标准化，因此没有这样的问题\n解码器 N=6的层构成，但相比于编码器里的层，解码器里多了一个子层。注意力机制的特点是，它能够一次性地看到完整的输入，但是序列生成模型，在逻辑上来所，生成当前时刻的输出时不应该看到之后的输出。为了实现这个效果，解码器使用了一个带掩码的多头注意力机制（Masked multi-head attention)\nScaled Dot-Product Attention Transformer的self-attention的相似函数是最常见的dot-product。 它的query,key的维度都等于$d_k$，value维度是$d_v$，输出是value的加权和所以和value等长。 它计算attention score(权重）的公式如下$$ Attention(Q,K,V) = softmax(\\frac{QK^T}{\\sqrt d_k})V$$ Q,K,V是query,key,value分别组成的矩阵\n它的这个方法和常见的dot-product注意力机制相比，多了一个scaled的步骤，即除以$\\sqrt d_k$。$d_k$很大的时候，即两个向量很长的时候，就会导致它们的运算结果在经过softmax后很接近1，而其它的权重更接近于0，此时计算梯度，会发现梯度比较小，模型训练速度很慢。由于该模型的$d_k=512$比较大，所以做一个scale. Masked 注意力机制会看到所有的输入，而masked只想要当前时刻和以前时刻的输入，因此在计算权重的时候不使用后面的值即可。 具体实现方法是，在$\\frac{QK^T}{\\sqrt d_k}$之后，对于以后时刻的输出值，将它们替换成一个很大的负数（例如-e10)，经过softmax后，对应的权重值会变成0\nMulti-Head Attention 将整个query, key, value通过投影降维 h 次，然后做h次的注意力函数，将所有函数的输出并在一起，再投影回来得到最终的输出\nQ，K，V经过线性层降维\nscaled dot-product attentino没有什么可以学习的参数，很难学习到识别不同模式的方法 而muti-head attention，线性层的w是可以学习的，也就是说，有h次机会让多头注意力在投影到的那个度量空间中学习到匹配不同模式的函数 它学习的公式如下:\n$$ \\begin{align} MultiHead(Q,K,V) = Concat(head_1, \\dots,head_h)W^o\\ where\\ head_i = Attention(QW^Q_i,KW^K_i,VW^V_i) \\end{align} $$\n原文实现中，h=8，投影之后的维度$d_k=d_v=d_{model}/h=64$.\nApplications of Attention in Transformer 编码器的输入是n x d的向量， 注意力层的输入有三个，分别是key, query, value，输出可见上述公式 解码器的输出是 n x d的向量\n解码器的掩码注意力层如前文所述，它的输出是 m x d的向量 另一个注意力层比较特殊，它的key和value来自于编码器的输出，query来自于解码器的下面的注意力层的输出。也就是说，这一层是把编码器里的输出中有用的信息拎出来，实现了编码器与解码器间的信息传递\nPosition-wise Feed Forward Networks 它就是一个MLP，特点是它把MLP对每一个词作用一次，对每一个词起作用的是同一个MLP $$ FFN(x) = max(0,xW_1+b_1)W_2+b_2 $$ x的维度是512，w1会把维度变回2048，w2把维度变回512 代码中用一维卷积来实现point-wise的效果\nAttention vs. RNN 传递序列信息 考虑最简单的情况，没有残差连接，单头attention，解码器的结构如下： attention的作用就是把整个序列中的信息抓取出来，得到的每一个输出都有它想要的信息，因此可以用MLP单独将每一个输出映射到对应的语义空间中的向量\n作为对比考虑RNN的情况，第一层是MLP，将前一个输入经过mlp得到的输出作为当前mlp的输入，如下： Embedding and Softmax embedding就是说对于每一个词，希望学习到一个向量去表示它 两个embedding层的权重以及最后一个线性层的权重是一样的，但最后embedding的权重会乘上一个$\\sqrt{d_{model}}$ ，因为如果使用 Xavier 初始化，Embedding 的方差为 1/d_model，当d_model非常大时，矩阵中的每一个值都会减小。乘上一个常数之后，在与positional encoding相加时两个的scale大小差不多\nPositional Encoding attention没有时序信息，它不会注意单词的位置，也就是说对于同一个序列，任意打乱之后再经过attention，得到的结果的顺序会变，但是值是一样的，因此要加入时序信息 positional encoding会在输入中加入时序信息，公式是sin,cos的复合函数，会生成维度与输入一致为512的，值在[-1,+1] 抖动的向量，最后加上embedding层的输出\nWhy self-attention 比较了自注意力、循环层、卷积层、构造出来的受限的自注意力的性能表现 第二列表示并行度，第三列表示得到两个点之间的关系需要的计算量 循环层和自注意力的时间复杂度是差不多的，由于是时序性地，因此序列操作是O(n)，同样，传递信息也是时序性的 卷积的时间复杂度和循环层差不多，一次卷积就能完成，每一次检查信息是通过一个宽度为k的窗口看，如果两个点不在同一个窗口内，就要多层才能看到两个点的信息，因此是$O(log_k(n))$ 受限的自注意力，query只跟r个邻居去计算\n由上表的比较可知，self-attention的性能看起来更好\n但在实际中，由于self-attention对模型的假设做得更少，因此要用更大的模型和更多的数据才能训练出来和CNN和RNN同样的效果，所以基于Transformer的模型一般都很贵\nTraning 暂时不需要了解训练细节\n代码实现 数据预处理时，由于输入的序列长度不一，因此需要做截断和填充操作。这样使得一个batch的序列长度一致，便于并行处理。 当把这些经过填充后的序列喂给编码器时，需要实现一个函数来告知哪一些词元是填充词元，以免这些填充词元参与attention weight的计算 可见视频2.Decoder代码解读_哔哩哔哩_bilibili\n",
+  "wordCount" : "3942",
+  "inLanguage": "zh",
+  "datePublished": "2023-12-04T23:09:06+08:00",
+  "dateModified": "2023-12-04T23:09:06+08:00",
+  "author":[{
+    "@type": "Person",
+    "name": "ShacklesLay"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://shackleslay.github.io/posts/third/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ShacklesLay's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://shackleslay.github.io/favicon.ico"
+    }
+  }
+}
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.js"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ]
+        });
+    });
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://shackleslay.github.io/" accesskey="h" title="ShacklesLay&#39;s Blog (Alt + H)">ShacklesLay&#39;s Blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://shackleslay.github.io/" title="ShacklesLay&#39;s Blog">
+                    <span>文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://shackleslay.github.io/archives/" title="时间轴">
+                    <span>时间轴</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://shackleslay.github.io/search/" title="搜索">
+                    <span>搜索</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://shackleslay.github.io/tags/" title="Tags">
+                    <span>标签</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title">
+      Third
+    </h1>
+    <div class="post-meta"><span title='2023-12-04 23:09:06 +0800 CST'>十二月 4, 2023</span>&nbsp;·&nbsp;8 分钟&nbsp;·&nbsp;ShacklesLay
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">目录</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#%e6%91%98%e8%a6%81" aria-label="摘要">摘要</a></li>
+                <li>
+                    <a href="#%e7%bb%93%e8%ae%ba" aria-label="结论">结论</a></li>
+                <li>
+                    <a href="#%e5%af%bc%e8%a8%80" aria-label="导言">导言</a></li>
+                <li>
+                    <a href="#%e7%9b%b8%e5%85%b3%e5%b7%a5%e4%bd%9c" aria-label="相关工作">相关工作</a></li>
+                <li>
+                    <a href="#%e6%a8%a1%e5%9e%8b" aria-label="模型">模型</a><ul>
+                        
+                <li>
+                    <a href="#%e7%bc%96%e7%a0%81%e5%99%a8%e5%92%8c%e8%a7%a3%e7%a0%81%e5%99%a8" aria-label="编码器和解码器">编码器和解码器</a><ul>
+                        
+                <li>
+                    <a href="#%e7%bc%96%e7%a0%81%e5%99%a8" aria-label="编码器">编码器</a></li>
+                <li>
+                    <a href="#batch-normalization-vs-layer-nomalization" aria-label="batch normalization vs. Layer nomalization">batch normalization vs. Layer nomalization</a></li>
+                <li>
+                    <a href="#%e8%a7%a3%e7%a0%81%e5%99%a8" aria-label="解码器">解码器</a></li>
+                <li>
+                    <a href="#scaled-dot-product-attention" aria-label="Scaled Dot-Product Attention">Scaled Dot-Product Attention</a></li>
+                <li>
+                    <a href="#masked" aria-label="Masked">Masked</a></li>
+                <li>
+                    <a href="#multi-head-attention" aria-label="Multi-Head Attention">Multi-Head Attention</a></li>
+                <li>
+                    <a href="#applications-of-attention-in-transformer" aria-label="Applications of Attention in Transformer">Applications of Attention in Transformer</a></li></ul>
+                </li>
+                <li>
+                    <a href="#position-wise-feed-forward-networks" aria-label="Position-wise Feed Forward Networks">Position-wise Feed Forward Networks</a><ul>
+                        
+                <li>
+                    <a href="#attention-vs-rnn-%e4%bc%a0%e9%80%92%e5%ba%8f%e5%88%97%e4%bf%a1%e6%81%af" aria-label="Attention vs. RNN 传递序列信息">Attention vs. RNN 传递序列信息</a></li></ul>
+                </li>
+                <li>
+                    <a href="#embedding-and-softmax" aria-label="Embedding and Softmax">Embedding and Softmax</a></li>
+                <li>
+                    <a href="#positional-encoding" aria-label="Positional Encoding">Positional Encoding</a></li></ul>
+                </li>
+                <li>
+                    <a href="#why-self-attention" aria-label="Why self-attention">Why self-attention</a></li>
+                <li>
+                    <a href="#traning" aria-label="Traning">Traning</a></li>
+                <li>
+                    <a href="#%e4%bb%a3%e7%a0%81%e5%ae%9e%e7%8e%b0" aria-label="代码实现">代码实现</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>Transformer 原论文。学习于<a href="https://www.bilibili.com/video/BV1pu411o7BE/?spm_id_from=333.1007.top_right_bar_window_custom_collection.content.click&amp;vd_source=700fcb07f52f375b021ea1b1c3b01e12">Transformer论文逐段精读【论文精读】_哔哩哔哩_bilibili</a>。</p>
+<h1 id="摘要">摘要<a hidden class="anchor" aria-hidden="true" href="#摘要">#</a></h1>
+<p>主流的序列转换模型（例如机器翻译）主要依赖于复杂的CNN或RNN，网络架构有encoder 和 decoder，并且有着注意力机制。
+Transformer是一个简单的模型，只依赖注意力机制。
+这个模型在机器翻译上的效果很好。</p>
+<h1 id="结论">结论<a hidden class="anchor" aria-hidden="true" href="#结论">#</a></h1>
+<p>Transformer不同于其他模型的点是，它把被广泛运用在encoder-decoder结构上的循环层（recurrent layer）换成了多头自注意力机制。
+他们觉得transformer能够在其他领域和任务上应用得很好。</p>
+<h1 id="导言">导言<a hidden class="anchor" aria-hidden="true" href="#导言">#</a></h1>
+<p>在序列模型中，主流的模型是RNN中的 long short-term memory(LSTM) 和 gated recurrent (GRU)。在这其中，有两个主流的模型，语言模型和编码器-解码器的架构，后者通常被用于输出的结构化信息比较多的时候。
+在RNN中，它是一个词接着一个词的输出，它们生成当前词的隐藏状态，是根据当前词的输入和前一个词的隐藏状态，这使得它能够时序化地生成。
+问题在于，这样一个时序化的过程无法并行，计算性能就会比较差；另外，在生成后面的词的隐藏状态时，前面的词的隐藏状态可能会丢掉，如果不想丢掉，可能需要做一个比较大的隐藏状态，这加剧了内存开销。虽然有着很多的研究与改进，但没有解决这些问题。
+Transformer纯基于注意力机制，因此可以并行，计算性能更高。</p>
+<h1 id="相关工作">相关工作<a hidden class="anchor" aria-hidden="true" href="#相关工作">#</a></h1>
+<p>已经发表的很多工作意图用卷积神经网络代替循环神经网络，但是卷积神经网络很难对一个长序列建模，因为卷积每一次都只看一个很小的窗口，如果想要同时看到很远的两个位置，需要很深的卷积层才能实现。如果使用Transformer就能够很轻易的同时看到。
+卷积神经网络的一个优势在于它可以有很多的输出通道，每一个输出通道都可以识别一个模式，Transformer的多头注意力机制可以模仿这个效果。
+自注意机制在前人的工作中就已经提出。但transformer是第一个只基于注意力机制的编码器-解码器模型</p>
+<h1 id="模型">模型<a hidden class="anchor" aria-hidden="true" href="#模型">#</a></h1>
+<p>编码器会将序列输入$(x_1,\dots,x_n)$ （每一个$x_i$代表一个词）转换为序列$z=(z_1,\dots, z_n)$ （每一个$z_i$是对$x_i$的向量表示）
+解码器拿到$z$后，会输出序列$(y_1,\dots,y_m)$，注意输出序列的长度与编码器的输出长度可能不一致，而且这个输出只能一个一个生成，这是一个auto-regressive（自回归）的过程，即过去时刻的输出，也会作为当前输出的输入。
+Transformer也是编码器-解码器的架构，结构如下：
+<img loading="lazy" src="https://images-1312392112.cos.ap-shanghai.myqcloud.com/images/202301111022110.png" alt="500"  />
+</p>
+<p>模型左边是编码器，右边是解码器。解码器的输入端其实是以前时刻的输出，所以名为Outputs, shifted right意为解码器输出和输入都是一个一个向右移的</p>
+<h2 id="编码器和解码器">编码器和解码器<a hidden class="anchor" aria-hidden="true" href="#编码器和解码器">#</a></h2>
+<h3 id="编码器">编码器<a hidden class="anchor" aria-hidden="true" href="#编码器">#</a></h3>
+<p>它用了N=6的六个块（原文中称为layer），每一层中有两个子层，多头自注意力机制和position-wise fully connected feed-forward network，后面这个网络其实就是MLP。每一子层再作残差链接，并作layer normalization，即 $LayerNorm(x+Sublayer(x))$。由于残差连接要求向量长度一样，因此它让每一个子层的输出维度都是 $d_{model}=512$
+(这个简单设计使得Transformer相比于CNN等模型具有更少的超参数，它一般只调整上述的两个超参数)</p>
+<h3 id="batch-normalization-vs-layer-nomalization">batch normalization vs. Layer nomalization<a hidden class="anchor" aria-hidden="true" href="#batch-normalization-vs-layer-nomalization">#</a></h3>
+<p>考虑一个二维输入的情况，x是一个batch，shape(x)=m,n，每一行代表一个样本，每一列代表一个特征。batch norm把每一个特征在一个mini-batch里作标准化，即把每一列的均值变为0，方差变为1。而作预测时会将全局的均值和方差记录下来
+同样一个二维输入，layer norm对每一行作标准化，不需要记录全局的均值和方差
+transformer里的输入一般是三维的（batch, 序列，向量），此时列表示的是序列的长度。
+在时序模型里，样本的长度可能不一致，如果样本的长度变化较大，由于batch norm时按照特征维度作标准化，batch norm算出来的均值和方差抖动会比较大；而layer norm由于是对每一个样本作标准化，因此没有这样的问题</p>
+<p><img loading="lazy" src="https://images-1312392112.cos.ap-shanghai.myqcloud.com/images/202301111042827.png" alt=""  />
+</p>
+<h3 id="解码器">解码器<a hidden class="anchor" aria-hidden="true" href="#解码器">#</a></h3>
+<p>N=6的层构成，但相比于编码器里的层，解码器里多了一个子层。注意力机制的特点是，它能够一次性地看到完整的输入，但是序列生成模型，在逻辑上来所，生成当前时刻的输出时不应该看到之后的输出。为了实现这个效果，解码器使用了一个带掩码的多头注意力机制（Masked multi-head attention)</p>
+<h3 id="scaled-dot-product-attention">Scaled Dot-Product Attention<a hidden class="anchor" aria-hidden="true" href="#scaled-dot-product-attention">#</a></h3>
+<p>Transformer的self-attention的相似函数是最常见的dot-product。
+它的query,key的维度都等于$d_k$，value维度是$d_v$，输出是value的加权和所以和value等长。
+它计算attention score(权重）的公式如下$$
+Attention(Q,K,V) = softmax(\frac{QK^T}{\sqrt d_k})V$$
+Q,K,V是query,key,value分别组成的矩阵</p>
+<p>它的这个方法和常见的dot-product注意力机制相比，多了一个scaled的步骤，即除以$\sqrt d_k$。$d_k$很大的时候，即两个向量很长的时候，就会导致它们的运算结果在经过softmax后很接近1，而其它的权重更接近于0，此时计算梯度，会发现梯度比较小，模型训练速度很慢。由于该模型的$d_k=512$比较大，所以做一个scale.
+<img loading="lazy" src="https://images-1312392112.cos.ap-shanghai.myqcloud.com/images/202301111150698.png" alt=""  />
+</p>
+<h3 id="masked">Masked<a hidden class="anchor" aria-hidden="true" href="#masked">#</a></h3>
+<p>注意力机制会看到所有的输入，而masked只想要当前时刻和以前时刻的输入，因此在计算权重的时候不使用后面的值即可。
+具体实现方法是，在$\frac{QK^T}{\sqrt d_k}$之后，对于以后时刻的输出值，将它们替换成一个很大的负数（例如-e10)，经过softmax后，对应的权重值会变成0</p>
+<h3 id="multi-head-attention">Multi-Head Attention<a hidden class="anchor" aria-hidden="true" href="#multi-head-attention">#</a></h3>
+<p>将整个query, key, value通过投影降维 h 次，然后做h次的注意力函数，将所有函数的输出并在一起，再投影回来得到最终的输出</p>
+<p><img loading="lazy" src="https://images-1312392112.cos.ap-shanghai.myqcloud.com/images/202301111153992.png" alt=""  />
+
+Q，K，V经过线性层降维</p>
+<p>scaled dot-product attentino没有什么可以学习的参数，很难学习到识别不同模式的方法
+而muti-head attention，线性层的w是可以学习的，也就是说，有h次机会让多头注意力在投影到的那个度量空间中学习到匹配不同模式的函数
+它学习的公式如下:</p>
+<p>$$
+\begin{align}
+MultiHead(Q,K,V) = Concat(head_1, \dots,head_h)W^o\
+where\ head_i = Attention(QW^Q_i,KW^K_i,VW^V_i)
+\end{align}
+$$</p>
+<p>原文实现中，h=8，投影之后的维度$d_k=d_v=d_{model}/h=64$.</p>
+<h3 id="applications-of-attention-in-transformer">Applications of Attention in Transformer<a hidden class="anchor" aria-hidden="true" href="#applications-of-attention-in-transformer">#</a></h3>
+<p><img loading="lazy" src="https://images-1312392112.cos.ap-shanghai.myqcloud.com/images/202301111022110.png" alt="500"  />
+
+编码器的输入是n x d的向量，
+注意力层的输入有三个，分别是key, query, value，输出可见上述公式
+解码器的输出是 n x d的向量</p>
+<p>解码器的掩码注意力层如前文所述，它的输出是 m x d的向量
+另一个注意力层比较特殊，它的key和value来自于编码器的输出，query来自于解码器的下面的注意力层的输出。也就是说，这一层是把编码器里的输出中有用的信息拎出来，实现了编码器与解码器间的信息传递</p>
+<h2 id="position-wise-feed-forward-networks">Position-wise Feed Forward Networks<a hidden class="anchor" aria-hidden="true" href="#position-wise-feed-forward-networks">#</a></h2>
+<p>它就是一个MLP，特点是它把MLP对每一个词作用一次，对每一个词起作用的是同一个MLP
+$$
+FFN(x) = max(0,xW_1+b_1)W_2+b_2
+$$
+x的维度是512，w1会把维度变回2048，w2把维度变回512
+代码中用一维卷积来实现point-wise的效果</p>
+<h3 id="attention-vs-rnn-传递序列信息">Attention vs. RNN 传递序列信息<a hidden class="anchor" aria-hidden="true" href="#attention-vs-rnn-传递序列信息">#</a></h3>
+<p>考虑最简单的情况，没有残差连接，单头attention，解码器的结构如下：
+<img loading="lazy" src="https://images-1312392112.cos.ap-shanghai.myqcloud.com/images/202301111219585.png" alt=""  />
+
+attention的作用就是把整个序列中的信息抓取出来，得到的每一个输出都有它想要的信息，因此可以用MLP单独将每一个输出映射到对应的语义空间中的向量</p>
+<p>作为对比考虑RNN的情况，第一层是MLP，将前一个输入经过mlp得到的输出作为当前mlp的输入，如下：
+<img loading="lazy" src="https://images-1312392112.cos.ap-shanghai.myqcloud.com/images/202301111223779.png" alt=""  />
+</p>
+<h2 id="embedding-and-softmax">Embedding and Softmax<a hidden class="anchor" aria-hidden="true" href="#embedding-and-softmax">#</a></h2>
+<p>embedding就是说对于每一个词，希望学习到一个向量去表示它
+两个embedding层的权重以及最后一个线性层的权重是一样的，但最后embedding的权重会乘上一个$\sqrt{d_{model}}$ ，因为如果使用 Xavier 初始化，Embedding 的方差为 1/d_model，当d_model非常大时，矩阵中的每一个值都会减小。乘上一个常数之后，在与positional encoding相加时两个的scale大小差不多</p>
+<h2 id="positional-encoding">Positional Encoding<a hidden class="anchor" aria-hidden="true" href="#positional-encoding">#</a></h2>
+<p>attention没有时序信息，它不会注意单词的位置，也就是说对于同一个序列，任意打乱之后再经过attention，得到的结果的顺序会变，但是值是一样的，因此要加入时序信息
+positional encoding会在输入中加入时序信息，公式是sin,cos的复合函数，会生成维度与输入一致为512的，值在[-1,+1] 抖动的向量，最后加上embedding层的输出</p>
+<h1 id="why-self-attention">Why self-attention<a hidden class="anchor" aria-hidden="true" href="#why-self-attention">#</a></h1>
+<p>比较了自注意力、循环层、卷积层、构造出来的受限的自注意力的性能表现
+第二列表示并行度，第三列表示得到两个点之间的关系需要的计算量
+<img loading="lazy" src="https://images-1312392112.cos.ap-shanghai.myqcloud.com/images/202301111300916.png" alt=""  />
+
+循环层和自注意力的时间复杂度是差不多的，由于是时序性地，因此序列操作是O(n)，同样，传递信息也是时序性的
+卷积的时间复杂度和循环层差不多，一次卷积就能完成，每一次检查信息是通过一个宽度为k的窗口看，如果两个点不在同一个窗口内，就要多层才能看到两个点的信息，因此是$O(log_k(n))$
+受限的自注意力，query只跟r个邻居去计算</p>
+<p>由上表的比较可知，self-attention的性能看起来更好</p>
+<p>但在实际中，由于self-attention对模型的假设做得更少，因此要用更大的模型和更多的数据才能训练出来和CNN和RNN同样的效果，所以基于Transformer的模型一般都很贵</p>
+<h1 id="traning">Traning<a hidden class="anchor" aria-hidden="true" href="#traning">#</a></h1>
+<p>暂时不需要了解训练细节</p>
+<h1 id="代码实现">代码实现<a hidden class="anchor" aria-hidden="true" href="#代码实现">#</a></h1>
+<p>数据预处理时，由于输入的序列长度不一，因此需要做截断和填充操作。这样使得一个batch的序列长度一致，便于并行处理。
+当把这些经过填充后的序列喂给编码器时，需要实现一个函数来告知哪一些词元是填充词元，以免这些填充词元参与attention weight的计算
+可见视频<a href="https://www.bilibili.com/video/BV1dR4y1E7aL/?p=2&amp;spm_id_from=pageDriver&amp;vd_source=700fcb07f52f375b021ea1b1c3b01e12">2.Decoder代码解读_哔哩哔哩_bilibili</a></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+<nav class="paginav">
+  <a class="next" href="https://shackleslay.github.io/posts/second-post/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>Second Post</span>
+  </a>
+</nav>
+
+
+<div class="share-buttons">
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Third on x"
+        href="https://x.com/intent/tweet/?text=Third&amp;url=https%3a%2f%2fshackleslay.github.io%2fposts%2fthird%2f&amp;hashtags=">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z"/>
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Third on linkedin"
+        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fshackleslay.github.io%2fposts%2fthird%2f&amp;title=Third&amp;summary=Third&amp;source=https%3a%2f%2fshackleslay.github.io%2fposts%2fthird%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Third on reddit"
+        href="https://reddit.com/submit?url=https%3a%2f%2fshackleslay.github.io%2fposts%2fthird%2f&title=Third">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Third on facebook"
+        href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2fshackleslay.github.io%2fposts%2fthird%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Third on whatsapp"
+        href="https://api.whatsapp.com/send?text=Third%20-%20https%3a%2f%2fshackleslay.github.io%2fposts%2fthird%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Third on telegram"
+        href="https://telegram.me/share/url?text=Third&amp;url=https%3a%2f%2fshackleslay.github.io%2fposts%2fthird%2f">
+        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+            <path
+                d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Third on ycombinator"
+        href="https://news.ycombinator.com/submitlink?t=Third&u=https%3a%2f%2fshackleslay.github.io%2fposts%2fthird%2f">
+        <svg version="1.1" xml:space="preserve" width="30px" height="30px" viewBox="0 0 512 512" fill="currentColor"
+            xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+            <path
+                d="M449.446 0C483.971 0 512 28.03 512 62.554L512 449.446C512 483.97 483.97 512 449.446 512L62.554 512C28.03 512 0 483.97 0 449.446L0 62.554C0 28.03 28.029 0 62.554 0L449.446 0ZM183.8767 87.9921H121.8427L230.6673 292.4508V424.0079H281.3328V292.4508L390.1575 87.9921H328.1233L256 238.2489z" />
+        </svg>
+    </a>
+</div>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2023 <a href="https://shackleslay.github.io/">ShacklesLay&#39;s Blog</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,3 @@
+User-agent: *
+Disallow:
+Sitemap: https://shackleslay.github.io/sitemap.xml
